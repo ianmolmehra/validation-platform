@@ -1,0 +1,54 @@
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: vp_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-password}
+      MYSQL_DATABASE: validation_platform
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-password}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: vp_backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: mysql+pymysql://root:${MYSQL_ROOT_PASSWORD:-password}@mysql:3306/validation_platform
+      UPLOAD_DIR: /tmp/validation_uploads
+      REPORTS_DIR: /tmp/validation_reports
+    ports:
+      - "8000:8000"
+    volumes:
+      - uploads_data:/tmp/validation_uploads
+      - reports_data:/tmp/validation_reports
+
+  frontend:
+    build: ./frontend
+    container_name: vp_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    environment:
+      BACKEND_URL: http://backend:8000
+      PORT: "80"
+
+volumes:
+  mysql_data:
+  uploads_data:
+  reports_data:

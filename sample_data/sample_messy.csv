@@ -1,0 +1,22 @@
+Order ID,Order Date,Customer Name,Customer Phone,Country,Order Amount,Product ID,Product Name,Quantity,Unit Price,Payment Mode,Payment Status,Transaction Reference Number
+ORD-4001,2024-07-01,Arjun Sharma,12345,India,12500.00,PROD-301,MacBook Air,1,12500.00,bitcoin,Paid,TXN-4001
+ORD-4002,99/99/2024,Priya Menon,,India,4500.00,PROD-302,iPhone Case,3,1500.00,paypal,Paid,TXN-4002
+ORD-4003,2024-07-03,,9123456780,India,-3200.00,PROD-303,USB-C Hub,2,1600.00,Cash,Paid,TXN-4003
+ORD-4004,2024-07-04,Meena Pillai,87654321,Singapore,0,PROD-304,Wireless Keyboard,1,890.00,Net Banking,Paid,TXN-4004
+ORD-4005,2024-07-05,John Smith,999,USA,2400.00,PROD-305,Dell Monitor,2,1200.00,crypto,Paid,TXN-4005
+ORD-4001,2024-07-06,Duplicate John,2125551234,USA,500.00,PROD-306,Duplicate,1,500.00,Card,Paid,TXN-4001
+ORD-4006,2035-01-01,Emma Wilson,07700900123,UK,599.00,PROD-307,Webcam,1,599.00,unknown_method,Paid,TXN-4006
+ORD-4007,2024-07-07,Wei Chen,,China,1800.00,PROD-308,Desk Mat,1,1800.00,Card,Paid,
+ORD-4008,2024-07-08,Fatima Al-Rashid,123456789012,UAE,950.00,PROD-309,Headphones,2,475.00,Mobile Money,Paid,TXN-4008
+ORD-4009,2024-07-09,Carlos Silva,55987654321,brazil,abc,PROD-310,Mouse Pad,4,105.00,Cash,Paid,TXN-4009
+ORD-4010,not-a-date,Sophie Martin,601234567,France,1250.00,PROD-311,Laptop Stand,1,1250.00,Card,Paid,TXN-4010
+ORD-4011,2024-07-11,,,,3600.00,PROD-312,Keyboard,,1800.00,Net Banking,Paid,TXN-4011
+ORD-4012,2024-07-12,Ananya Krishnan,0000000000,India,6200.00,PROD-313,Galaxy S24,1,6200.00,UPI,Paid,TXN-4012
+ORD-4013,2024-07-13,Tom Wilson,41234,Australia,1290.00,PROD-314,Gaming Mouse,1,1290.00,Card,Paid,TXN-4013
+ORD-4014,2024-07-14,Kavitha Nair,9988112233,India,-100.00,PROD-315,Smart Hub,1,-100.00,UPI,Paid,TXN-4014
+ORD-4015,2024-07-15,,16041234567,Canada,1850.00,PROD-316,VR Headset,0,1850.00,Wallet,Paid,TXN-4015
+ORD-4016,1990-01-01,Lena Mueller,4912345678,Germany,780.00,PROD-317,Desk Organiser,2,390.00,Card,Paid,TXN-4016
+ORD-4017,2024-07-17,Raj Patel,ABCXYZ,India,7800.00,PROD-318,DJI Drone,1,7800.00,barter,Paid,TXN-4017
+ORD-4018,2024-07-18,Alex Turner,07890123456,UK,820.00,PROD-319,Ring Light,2,410.00,Card,Paid,TXN-4018
+ORD-4019,2024-07-19,,9012345679,India,8900.00,,Air Purifier,1,,Net Banking,Paid,TXN-4019
+ORD-4020,2024-07-20,Preethi Iyer,9123456789,India,1400.00,PROD-320,Kindle,1,1400.00,UPI,Paid,TXN-4020
