@@ -28,10 +28,11 @@ export default function Upload() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    fetch(`${apiBase}/api/samples`)
-      .then(r => r.json())
-      .then(setSamples)
-      .catch(() => {})
+    setSamples([
+      { key: 'clean',  label: 'Clean Dataset',  description: '20 rows — well-formatted data, minor phone corrections', score: 98, badge: 'HIGH QUALITY' },
+      { key: 'mixed',  label: 'Mixed Dataset',  description: '20 rows — country codes in phones, date format variations, duplicate', score: 65, badge: 'NEEDS CLEANUP' },
+      { key: 'messy',  label: 'Messy Dataset',  description: '20 rows — missing fields, invalid phones, bad dates, negative amounts', score: 25, badge: 'POOR QUALITY' },
+    ])
   }, [])
 
   const onDrop = useCallback((accepted: File[]) => {
@@ -64,11 +65,17 @@ export default function Upload() {
     }
   }
 
+  const SAMPLE_URLS: Record<string, string> = {
+    clean: 'https://raw.githubusercontent.com/ianmolmehra/validation-platform/main/sample_data/sample_clean.csv',
+    mixed: 'https://raw.githubusercontent.com/ianmolmehra/validation-platform/main/sample_data/sample_mixed.csv',
+    messy: 'https://raw.githubusercontent.com/ianmolmehra/validation-platform/main/sample_data/sample_messy.csv',
+  }
+
   const handleSample = async (sample: Sample) => {
     setLoadingSample(sample.key)
     setError(null)
     try {
-      const res = await fetch(`${apiBase}/api/samples/${sample.key}`)
+      const res = await fetch(SAMPLE_URLS[sample.key])
       if (!res.ok) throw new Error('Failed to fetch sample')
       const blob = await res.blob()
       const sampleFile = new File([blob], `${sample.label.replace(/\s+/g,'_')}.csv`, { type: 'text/csv' })
