@@ -43,11 +43,13 @@ def generate_chunks(valid_df: pd.DataFrame, chunk_size: int = 50000) -> list[tup
 
 def generate_country_files(valid_df: pd.DataFrame, country_col: str = "country") -> list[tuple[str, bytes]]:
     files = []
-    if country_col not in valid_df.columns:
+    if not country_col or country_col not in valid_df.columns:
         return files
     for country in valid_df[country_col].dropna().unique():
+        if not str(country).strip():
+            continue
         subset = valid_df[valid_df[country_col] == country]
-        safe_name = str(country).replace(" ", "_").replace("/", "-")
+        safe_name = str(country).strip().replace(" ", "_").replace("/", "-")
         files.append((f"{safe_name}.csv", subset.to_csv(index=False).encode()))
     return files
 

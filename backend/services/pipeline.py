@@ -255,12 +255,17 @@ def run_pipeline(job_id: str, file_path: str, db: Session, chunk_size: int = 100
         for chunk_name, chunk_data in generate_chunks(valid_df, chunk_size):
             _save_report(db, job_id, job_dir, chunk_name, "chunk_csv", chunk_data)
             zip_files.append((f"chunks/{chunk_name}", chunk_data))
+        db.commit()
 
     # Country files
-    if not valid_df.empty and "country" in valid_df.columns:
-        for country_name, country_data in generate_country_files(valid_df):
+    if not valid_df.empty:
+        country_col = "country" if "country" in valid_df.columns else None
+        country_files = generate_country_files(valid_df, country_col) if country_col else []
+        for country_name, country_data in country_files:
             _save_report(db, job_id, job_dir, country_name, "country_csv", country_data)
             zip_files.append((f"countries/{country_name}", country_data))
+        if country_files:
+            db.commit()
 
     # ZIP
     zip_bytes = build_zip(zip_files)

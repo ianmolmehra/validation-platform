@@ -1,11 +1,32 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks, Depends
 from sqlalchemy.orm import Session
-import uuid, os, shutil
-from database import get_db
+import uuid, os, shutil, traceback
+from database import get_db, SessionLocal
 from models import Upload, ProcessingLog
 from services.pipeline import run_pipeline
 
 router = APIRouter(prefix="/api", tags=["Upload"])
+
+
+def _run_pipeline_task(job_id: str, file_path: str, chunk_size: int):
+    """Background task with its own DB session (request session is not thread-safe)."""
+    db = SessionLocal()
+    try:
+        run_pipeline(job_id, file_path, db, chunk_size)
+    except Exception as e:
+        print(f"Pipeline error for job {job_id}: {e}")
+        traceback.print_exc()
+        try:
+            upload = db.query(Upload).filter(Upload.job_id == job_id).first()
+            if upload:
+                upload.status = "failed"
+                db.add(ProcessingLog(job_id=job_id, event="PIPELINE_FAILED",
+                                     message=str(e), level="ERROR"))
+                db.commit()
+        except Exception:
+            pass
+    finally:
+        db.close()
 
 UPLOAD_DIR = os.getenv("UPLOAD_DIR", "/tmp/validation_uploads")
 
@@ -44,7 +65,7 @@ async def upload_file(
                          message=f"File '{file.filename}' uploaded ({file_size:,} bytes)", level="INFO"))
     db.commit()
 
-    background_tasks.add_task(run_pipeline, job_id, dest, db, chunk_size)
+    background_tasks.add_task(_run_pipeline_task, job_id, dest, chunk_size)
 
     return {
         "job_id": job_id,
