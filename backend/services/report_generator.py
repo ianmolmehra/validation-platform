@@ -16,6 +16,13 @@ from reportlab.lib.enums import TA_CENTER, TA_LEFT
 
 
 def generate_validated_csv(valid_df: pd.DataFrame) -> bytes:
+    # Reorder so phone_country_code appears right after customer_phone
+    if "phone_country_code" in valid_df.columns and "customer_phone" in valid_df.columns:
+        cols = list(valid_df.columns)
+        cols.remove("phone_country_code")
+        phone_idx = cols.index("customer_phone")
+        cols.insert(phone_idx + 1, "phone_country_code")
+        valid_df = valid_df[cols]
     # UTF-8 BOM so Excel opens it correctly without encoding issues
     return valid_df.to_csv(index=False).encode("utf-8-sig")
 

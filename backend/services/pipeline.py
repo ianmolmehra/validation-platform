@@ -111,6 +111,9 @@ def run_pipeline(job_id: str, file_path: str, db: Session, chunk_size: int = 100
         )
 
         cr = result["corrected_row"]
+        # Add phone_country_code column next to customer_phone
+        country_key = str(cr.get("country") or "").strip()
+        cr["phone_country_code"] = country_prefixes.get(country_key, "")
         cr["_row_number"] = row_num
         cr["_is_valid"] = result["is_valid"]
         cr["_is_duplicate"] = result["is_duplicate"]
