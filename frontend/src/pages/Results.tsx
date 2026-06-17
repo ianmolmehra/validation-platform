@@ -27,9 +27,9 @@ const PIPELINE_STAGES = [
 function PipelineViz({ status, completing, onDone }: { status: string; completing?: boolean; onDone?: () => void }) {
   const statusOrder = ['profiling', 'mapping', 'validating', 'phones', 'dates', 'duplicates', 'scoring', 'completed']
   const realIdx = statusOrder.indexOf(status)
-  const startIdx = realIdx === -1 ? 0 : realIdx
+  const startIdx = realIdx === -1 ? 0 : Math.min(realIdx, PIPELINE_STAGES.length - 1)
 
-  const [animIdx, setAnimIdx] = useState(startIdx)
+  const [animIdx, setAnimIdx] = useState(completing ? 0 : startIdx)
   const doneRef = useRef(false)
 
   useEffect(() => {
@@ -37,21 +37,21 @@ function PipelineViz({ status, completing, onDone }: { status: string; completin
       setAnimIdx(startIdx)
       return
     }
+    // Always restart from stage 0 so user sees every step light up
     doneRef.current = false
+    setAnimIdx(0)
+    let current = 0
     const interval = setInterval(() => {
-      setAnimIdx(prev => {
-        const next = prev + 1
-        if (next >= PIPELINE_STAGES.length) {
-          clearInterval(interval)
-          if (!doneRef.current) {
-            doneRef.current = true
-            setTimeout(() => onDone?.(), 400)
-          }
-          return prev
+      current += 1
+      setAnimIdx(current)
+      if (current >= PIPELINE_STAGES.length - 1) {
+        clearInterval(interval)
+        if (!doneRef.current) {
+          doneRef.current = true
+          setTimeout(() => onDone?.(), 900)
         }
-        return next
-      })
-    }, 280)
+      }
+    }, 700)
     return () => clearInterval(interval)
   }, [completing])
 
@@ -93,14 +93,14 @@ function PipelineViz({ status, completing, onDone }: { status: string; completin
             <div key={stage.key} className="flex flex-col items-center flex-1 relative">
               {/* Connector line left */}
               {i > 0 && (
-                <div className="absolute top-[14px] right-1/2 left-0 h-[2px] -translate-y-1/2"
-                  style={{ background: state === 'done' || (i <= displayIdx) ? '#10b981' : '#e5e7eb' }} />
+                <div className="absolute top-[14px] right-1/2 left-0 h-[2px] -translate-y-1/2 transition-all duration-500"
+                  style={{ background: i <= displayIdx ? '#10b981' : '#e5e7eb' }} />
               )}
               {/* Dot */}
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center z-10 text-xs font-bold transition-all duration-300 ${
-                state === 'done'   ? 'bg-emerald-500 text-white' :
-                state === 'active' ? 'bg-blue-600 text-white ring-4 ring-blue-100' :
-                                     'bg-gray-200 text-gray-500'
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center z-10 text-xs font-bold transition-all duration-500 ${
+                state === 'done'   ? 'bg-emerald-500 text-white scale-100' :
+                state === 'active' ? 'bg-blue-600 text-white ring-4 ring-blue-200 scale-110 animate-pulse' :
+                                     'bg-gray-200 text-gray-400 scale-90'
               }`}>
                 {state === 'done' ? <CheckCheck className="w-3.5 h-3.5" /> : i + 1}
               </div>
