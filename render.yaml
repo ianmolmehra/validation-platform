@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: validation-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: UPLOAD_DIR
+        value: /tmp/validation_uploads
+      - key: REPORTS_DIR
+        value: /tmp/validation_reports
+    healthCheckPath: /health
