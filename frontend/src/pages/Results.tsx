@@ -58,23 +58,29 @@ function PipelineViz({ status, completing, onDone }: { status: string; completin
   const displayIdx = completing ? animIdx : startIdx
   const allDone = completing && animIdx >= PIPELINE_STAGES.length - 1
 
+  const activeStage = allDone ? PIPELINE_STAGES[PIPELINE_STAGES.length - 1] : PIPELINE_STAGES[displayIdx] || PIPELINE_STAGES[0]
+
   return (
-    <div className="glass-card p-8 text-center max-w-2xl mx-auto w-full">
-      {allDone
-        ? <div className="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-5">
-            <CheckCircle2 className="w-8 h-8 text-emerald-500" />
-          </div>
-        : <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-600 rounded-full spinner mx-auto mb-5" />
-      }
-      <h3 className="font-bold text-gray-800 text-lg mb-1">
-        {allDone ? 'Validation Complete!' : 'Processing Your Dataset'}
-      </h3>
-      <p className="text-gray-400 text-sm mb-6">
-        {allDone ? 'Loading your results…' : 'Running 7-stage validation pipeline…'}
-      </p>
-      <div className="space-y-2">
+    <div className="glass-card p-8 max-w-3xl mx-auto w-full">
+      {/* Header */}
+      <div className="text-center mb-8">
+        {allDone
+          ? <div className="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-8 h-8 text-emerald-500" />
+            </div>
+          : <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-600 rounded-full spinner mx-auto mb-4" />
+        }
+        <h3 className="font-bold text-gray-800 text-lg">
+          {allDone ? 'Validation Complete!' : 'Processing Your Dataset'}
+        </h3>
+        <p className="text-gray-400 text-sm mt-1">
+          {allDone ? 'Loading your results…' : 'Running 7-stage validation pipeline…'}
+        </p>
+      </div>
+
+      {/* Horizontal stepper */}
+      <div className="flex items-start justify-between mb-6">
         {PIPELINE_STAGES.map((stage, i) => {
-          const Icon = stage.icon
           let state: 'done' | 'active' | 'pending' = 'pending'
           if (completing) {
             if (i < displayIdx) state = 'done'
@@ -84,32 +90,40 @@ function PipelineViz({ status, completing, onDone }: { status: string; completin
             else if (displayIdx === i || (displayIdx === -1 && i === 0)) state = 'active'
           }
           return (
-            <div key={stage.key} className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-300 ${
-              state === 'done'   ? 'bg-emerald-50 border border-emerald-200' :
-              state === 'active' ? 'bg-blue-50 border border-blue-300 shadow-sm' :
-                                   'bg-gray-50 border border-gray-100 opacity-40'
-            }`}>
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
-                state === 'done' ? 'bg-emerald-500' : state === 'active' ? 'bg-blue-600' : 'bg-gray-200'
+            <div key={stage.key} className="flex flex-col items-center flex-1 relative">
+              {/* Connector line left */}
+              {i > 0 && (
+                <div className="absolute top-[14px] right-1/2 left-0 h-[2px] -translate-y-1/2"
+                  style={{ background: state === 'done' || (i <= displayIdx) ? '#10b981' : '#e5e7eb' }} />
+              )}
+              {/* Dot */}
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center z-10 text-xs font-bold transition-all duration-300 ${
+                state === 'done'   ? 'bg-emerald-500 text-white' :
+                state === 'active' ? 'bg-blue-600 text-white ring-4 ring-blue-100' :
+                                     'bg-gray-200 text-gray-500'
               }`}>
-                {state === 'done'
-                  ? <CheckCheck className="w-4 h-4 text-white" />
-                  : <Icon className={`w-4 h-4 ${state === 'active' ? 'text-white' : 'text-gray-400'}`} />
-                }
+                {state === 'done' ? <CheckCheck className="w-3.5 h-3.5" /> : i + 1}
               </div>
-              <div className="flex-1 text-left">
-                <p className={`text-xs font-semibold transition-colors duration-300 ${
-                  state === 'done' ? 'text-emerald-700' : state === 'active' ? 'text-blue-700' : 'text-gray-400'
-                }`}>{stage.label}</p>
-                <p className="text-xs text-gray-400">{stage.desc}</p>
-              </div>
-              {state === 'active' && !allDone && <div className="w-5 h-5 border-2 border-blue-200 border-t-blue-600 rounded-full spinner" />}
-              {state === 'done'   && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+              {/* Label */}
+              <p className={`text-[10px] font-semibold mt-1.5 text-center leading-tight transition-colors duration-300 ${
+                state === 'done'   ? 'text-emerald-600' :
+                state === 'active' ? 'text-blue-600' :
+                                     'text-gray-400'
+              }`}>{stage.label}</p>
             </div>
           )
         })}
       </div>
-      {!completing && <p className="text-xs text-gray-300 mt-4">This page refreshes automatically</p>}
+
+      {/* Active stage description */}
+      {!allDone && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-center">
+          <p className="text-sm font-semibold text-blue-700">
+            Stage {displayIdx + 1} of {PIPELINE_STAGES.length} — {activeStage.desc}...
+          </p>
+        </div>
+      )}
+      {!completing && <p className="text-xs text-gray-300 mt-4 text-center">This page refreshes automatically</p>}
     </div>
   )
 }

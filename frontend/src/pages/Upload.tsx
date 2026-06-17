@@ -139,11 +139,21 @@ export default function Upload() {
                   key={s.key}
                   disabled={uploading || !!loadingSample}
                   onClick={() => handleSample(s)}
+                  onMouseMove={e => {
+                    if (uploading || loadingSample) return
+                    const el = e.currentTarget
+                    const rect = el.getBoundingClientRect()
+                    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 14
+                    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -14
+                    el.style.transform = `perspective(600px) rotateY(${x}deg) rotateX(${y}deg) translateY(-2px)`
+                  }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = '' }}
                   className={clsx(
                     'relative text-left rounded-xl border p-3.5 transition-all duration-150 group',
                     m.bg, m.border,
-                    uploading || loadingSample ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-md hover:-translate-y-0.5 cursor-pointer'
+                    uploading || loadingSample ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-lg cursor-pointer'
                   )}
+                  style={{ transition: 'transform 0.15s ease, box-shadow 0.15s ease' }}
                 >
                   {/* Badge */}
                   <span className={clsx('text-[10px] font-bold uppercase tracking-wide', m.color)}>{s.badge}</span>

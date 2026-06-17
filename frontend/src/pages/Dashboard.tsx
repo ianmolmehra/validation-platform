@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
 import { getAnalytics, getHistory } from '../api/client'
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip,
@@ -321,10 +322,37 @@ export default function Dashboard() {
   )
 }
 
+/* ─── Animated counter hook ─── */
+function useAnimatedCount(target: number, duration = 1200) {
+  const [display, setDisplay] = useState(0)
+  const prevTarget = useRef<number>(0)
+  useEffect(() => {
+    if (target === prevTarget.current) return
+    prevTarget.current = target
+    const start = Date.now()
+    const from = display
+    const tick = () => {
+      const elapsed = Date.now() - start
+      const progress = Math.min(elapsed / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setDisplay(Math.round(from + (target - from) * eased))
+      if (progress < 1) requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  }, [target])
+  return display
+}
+
 /* ─── Hero KPI card ─── */
 function HeroCard({ label, value, icon, gradient, sub, badge }: {
   label: string; value: any; icon: React.ReactNode; gradient: string; sub: string; badge?: string
 }) {
+  const numericValue = typeof value === 'string' ? parseInt(value.replace(/,/g, ''), 10) : (typeof value === 'number' ? value : 0)
+  const animated = useAnimatedCount(isNaN(numericValue) ? 0 : numericValue)
+  const displayValue = typeof value === 'string' && value.includes(',')
+    ? animated.toLocaleString()
+    : animated
+
   return (
     <div className={`${gradient} card-3d p-5 text-white`} style={{ transformStyle: 'preserve-3d' }}>
       <div className="flex items-center justify-between mb-3">
@@ -335,11 +363,10 @@ function HeroCard({ label, value, icon, gradient, sub, badge }: {
         </div>
       </div>
       <div className="flex items-end gap-2">
-        <p className="text-3xl font-extrabold animate-count leading-none">{value}</p>
+        <p className="text-3xl font-extrabold leading-none">{displayValue}</p>
         {badge && <span className="text-lg mb-0.5 opacity-80">{badge}</span>}
       </div>
       <p className="text-xs mt-2 opacity-60">{sub}</p>
-      {/* Bottom shimmer line */}
       <div className="absolute bottom-0 left-4 right-4 h-px rounded-full"
         style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)' }} />
     </div>
