@@ -1,7 +1,8 @@
+import { useState } from 'react'
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Upload, BarChart3, History, ScrollText,
-  Globe, ChevronRight, Bell, Settings, Shield, Sparkles
+  Globe, ChevronRight, Bell, Settings, Shield, Sparkles, Menu, X
 } from 'lucide-react'
 import clsx from 'clsx'
 
@@ -15,11 +16,22 @@ const NAV = [
 ]
 
 export default function Layout() {
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
   return (
     <div className="flex h-screen overflow-hidden app-bg">
 
+      {/* ── Mobile overlay backdrop ── */}
+      {sidebarOpen && (
+        <div
+          className="sidebar-backdrop"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* ── Sidebar ── */}
-      <aside className="sidebar flex flex-col flex-shrink-0" style={{ width: 230 }}>
+      <aside className={clsx('sidebar flex flex-col flex-shrink-0', sidebarOpen && 'sidebar-open')}
+        style={{ width: 230 }}>
 
         {/* Logo */}
         <div className="sidebar-logo px-5 py-5 flex items-center gap-3">
@@ -38,8 +50,16 @@ export default function Layout() {
             <p className="text-white font-bold text-sm leading-tight tracking-tight">Validation</p>
             <p className="text-xs leading-tight" style={{ color: 'rgba(148,163,184,0.7)' }}>Platform v2</p>
           </div>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
             <Sparkles className="w-3.5 h-3.5" style={{ color: 'rgba(139,92,246,0.6)' }} />
+            {/* Close button — mobile only */}
+            <button
+              className="sidebar-close-btn"
+              onClick={() => setSidebarOpen(false)}
+              aria-label="Close menu"
+            >
+              <X style={{ width: 16, height: 16, color: 'rgba(148,163,184,0.7)' }} />
+            </button>
           </div>
         </div>
 
@@ -48,9 +68,10 @@ export default function Layout() {
           <p className="px-3 pb-2 pt-1 text-[10px] font-bold uppercase tracking-widest"
             style={{ color: 'rgba(100,116,139,0.7)' }}>Navigation</p>
           {NAV.map(({ to, icon: Icon, label, color }) => (
-            <NavLink key={to} to={to} className={({ isActive }) =>
-              clsx('nav-item', isActive && 'nav-item-active')
-            }>
+            <NavLink key={to} to={to}
+              onClick={() => setSidebarOpen(false)}
+              className={({ isActive }) => clsx('nav-item', isActive && 'nav-item-active')}
+            >
               {({ isActive }) => (
                 <>
                   <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-200"
@@ -96,11 +117,21 @@ export default function Layout() {
       </aside>
 
       {/* ── Main ── */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
 
         {/* Topbar */}
-        <header className="topbar px-6 py-3.5 flex items-center justify-between flex-shrink-0">
-          <Breadcrumb />
+        <header className="topbar px-4 md:px-6 py-3.5 flex items-center justify-between flex-shrink-0">
+          <div className="flex items-center gap-3">
+            {/* Hamburger — mobile only */}
+            <button
+              className="sidebar-hamburger"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open menu"
+            >
+              <Menu style={{ width: 20, height: 20, color: '#64748b' }} />
+            </button>
+            <Breadcrumb />
+          </div>
           <div className="flex items-center gap-2.5">
             {/* Bell */}
             <button className="relative p-2 rounded-xl transition-all duration-150"
@@ -125,7 +156,7 @@ export default function Layout() {
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto p-6 app-bg">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 app-bg">
           <Outlet />
         </main>
       </div>

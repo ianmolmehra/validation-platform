@@ -427,3 +427,67 @@ input:focus, select:focus, textarea:focus {
 
 /* ─── Table hover ────────────────────────────────────────────────── */
 tbody tr { transition: background 0.15s ease; }
+
+/* ─── Mobile sidebar ─────────────────────────────────────────────── */
+.sidebar-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 10px;
+  background: rgba(241,245,249,0.8);
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.sidebar-close-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.06);
+  border: none;
+  cursor: pointer;
+}
+
+.sidebar-backdrop {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 50;
+    transform: translateX(-100%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 230px !important;
+  }
+
+  .sidebar.sidebar-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    animation: fadeIn 0.2s ease forwards;
+  }
+
+  .sidebar-hamburger {
+    display: flex;
+  }
+
+  .sidebar-close-btn {
+    display: flex;
+  }
+}
